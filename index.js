@@ -58,8 +58,9 @@ app.get("/desafio", async (req, res) => {
 
     // Crea una fecha
     moment.locale("es");
-    const timestamp = moment().format("LLL");
+    const timestamp = moment(data.results[0].registered.date).format("LLL");
 
+    // Se crea el objeto usuario
     const usuario = {
       uid,
       firstName: data.results[0].name.first,
@@ -68,18 +69,23 @@ app.get("/desafio", async (req, res) => {
       timestamp,
     };
 
+    // Agrego el objeto usuario al array usuarios con el metodo push de los arrays
     usuarios.push(usuario);
 
+    // Aqui imprimo la lista de usuarios en la consola con fondo blanco y color de texto azul
+    console.log(chalk.bgWhite.blue("Lista de Usuarios:"));
+    usuarios.forEach((usuario) => {
+      const usuarioString = JSON.stringify(usuario, null, 2);
+      const usuarioChalk = chalk.bgWhite.blue(usuarioString);
+      console.log(usuarioChalk);
+    });
 
-    // Separar usuarios por género utilizando lodash
+    // Separa los usuarios por género utilizando lodash
     const usuariosPorGenero = lodash.groupBy(usuarios, "gender");
     const mujeres = usuariosPorGenero["female"] || [];
     const hombres = usuariosPorGenero["male"] || [];
 
-    console.log(mujeres);
-    console.log(hombres);
-
-
+    //Renderizo la vista y le pasos los datos
     res.render("desafio", { mensaje, mujeres, hombres, usuarios });
   } catch (error) {
     mensaje = "No fue posible registrar al nuevo usuario";
@@ -89,9 +95,10 @@ app.get("/desafio", async (req, res) => {
   }
 });
 
-app.post("/eliminar",  (req, res) => {
+// Elimino los usuarios cuando recibo un post a eliminar
+app.post("/eliminar", (req, res) => {
   usuarios = [];
-  res.redirect('/desafio'); 
+  res.redirect("/desafio");
 });
 
 // 404 para cualquier otra ruta
